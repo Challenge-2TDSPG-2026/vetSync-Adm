@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetSync Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primaria: '#0e3326',
+                        secundaria: '#22a06b',
+                        destaque: '#3db87e',
+                        fundo: '#fafaf8',
+                        fundoCard: '#FFFFFF',
+                        texto: '#1a1512',
+                        textoSecundario: '#7a6a5e',
+                        borda: '#e8e2da'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fafaf8;
+            color: #1a1512;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Tela de Login -->
+    <div id="login-screen" class="flex-1 flex items-center justify-center w-full">
+        <div class="bg-fundoCard p-8 rounded-xl shadow-lg border border-borda w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-primaria mb-2">VetSync Admin</h1>
+                <p class="text-textoSecundario">Entre com seu acesso</p>
+            </div>
+
+            <div id="login-error" class="hidden bg-red-100 text-red-600 p-3 rounded-lg mb-4 text-sm text-center">
+                E-mail ou senha inválidos.
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-texto mb-1">E-mail</label>
+                    <input type="email" id="email" required class="w-full p-3 border border-borda rounded-lg focus:outline-none focus:border-secundaria focus:ring-1 focus:ring-secundaria" placeholder="admin@admin.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-texto mb-1">Senha</label>
+                    <input type="password" id="senha" required class="w-full p-3 border border-borda rounded-lg focus:outline-none focus:border-secundaria focus:ring-1 focus:ring-secundaria" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-secundaria text-white font-bold py-3 rounded-lg hover:bg-destaque transition-colors">
+                    Entrar
+                </button>
+            </form>
+            <div class="mt-4 text-center text-sm text-textoSecundario">
+                Credenciais: admin@admin.com / admin
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard-screen" class="hidden w-full max-w-5xl">
+        <header class="flex justify-between items-center py-6 mb-6 border-b border-borda">
+            <div>
+                <h1 class="text-2xl font-bold text-primaria">Administração</h1>
+                <p class="text-textoSecundario">Gerenciamento de Gestores de Clínica</p>
+            </div>
+            <button id="logout-btn" class="px-4 py-2 border border-borda text-textoSecundario rounded-lg hover:bg-gray-100 transition-colors">
+                Sair
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Formulário de Cadastro -->
+            <div class="md:col-span-1 bg-fundoCard p-6 rounded-xl shadow-sm border border-borda h-fit">
+                <h2 class="text-lg font-bold text-primaria mb-4">Novo Gestor</h2>
+                <form id="register-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-texto mb-1">Nome do Gestor</label>
+                        <input type="text" id="gestor-nome" required class="w-full p-2 border border-borda rounded-lg focus:outline-none focus:border-secundaria">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-texto mb-1">E-mail</label>
+                        <input type="email" id="gestor-email" required class="w-full p-2 border border-borda rounded-lg focus:outline-none focus:border-secundaria">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-texto mb-1">Nome da Clínica</label>
+                        <input type="text" id="clinica-nome" required class="w-full p-2 border border-borda rounded-lg focus:outline-none focus:border-secundaria">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-texto mb-1">Endereço da Clínica</label>
+                        <input type="text" id="clinica-end" required class="w-full p-2 border border-borda rounded-lg focus:outline-none focus:border-secundaria">
+                    </div>
+                    <button type="submit" class="w-full bg-primaria text-white font-bold py-2 rounded-lg hover:bg-secundaria transition-colors mt-2">
+                        Cadastrar Gestor
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista de Gestores -->
+            <div class="md:col-span-2 bg-fundoCard p-6 rounded-xl shadow-sm border border-borda">
+                <h2 class="text-lg font-bold text-primaria mb-4">Gestores Cadastrados</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-borda text-textoSecundario text-sm">
+                                <th class="py-3 px-4 font-medium">Gestor</th>
+                                <th class="py-3 px-4 font-medium">Clínica</th>
+                                <th class="py-3 px-4 font-medium">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gestores-list">
+                            <!-- Os itens serão injetados aqui via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="empty-state" class="text-center py-8 text-textoSecundario hidden">
+                    Nenhum gestor cadastrado no momento.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const registerForm = document.getElementById('register-form');
+        const gestoresList = document.getElementById('gestores-list');
+        const emptyState = document.getElementById('empty-state');
+
+        // Estado da Aplicação
+        let gestores = [
+            { id: 1, nome: 'Ana Costa', email: 'ana@clinicavida.com', clinica: 'Clínica Vida Pet', endereco: 'Av. Paulista, 1000 - SP' },
+            { id: 2, nome: 'Carlos Mendes', email: 'carlos@vetcare.com.br', clinica: 'VetCare', endereco: 'Rua das Flores, 123 - RJ' }
+        ];
+
+        // Autenticação mockada
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            if (email === 'admin@admin.com' && senha === 'admin') {
+                loginScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+                dashboardScreen.classList.add('flex', 'flex-col');
+                renderGestores();
+                loginError.classList.add('hidden');
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            dashboardScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('flex', 'flex-col');
+            loginScreen.classList.remove('hidden');
+            loginForm.reset();
+        });
+
+        // Cadastrar novo gestor
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const novoGestor = {
+                id: Date.now(),
+                nome: document.getElementById('gestor-nome').value,
+                email: document.getElementById('gestor-email').value,
+                clinica: document.getElementById('clinica-nome').value,
+                endereco: document.getElementById('clinica-end').value,
+            };
+
+            gestores.push(novoGestor);
+            renderGestores();
+            registerForm.reset();
+        });
+
+        // Deletar gestor
+        function deleteGestor(id) {
+            gestores = gestores.filter(g => g.id !== id);
+            renderGestores();
+        }
+
+        // Renderizar lista na tabela
+        function renderGestores() {
+            gestoresList.innerHTML = '';
+            
+            if (gestores.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                gestores.forEach(g => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-borda hover:bg-fundo transition-colors';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4">
+                            <p class="font-medium text-primaria">${g.nome}</p>
+                            <p class="text-xs text-textoSecundario">${g.email}</p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <p class="font-medium text-texto">${g.clinica}</p>
+                            <p class="text-xs text-textoSecundario">${g.endereco}</p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <button onclick="deleteGestor(${g.id})" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                                Excluir
+                            </button>
+                        </td>
+                    `;
+                    gestoresList.appendChild(tr);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
